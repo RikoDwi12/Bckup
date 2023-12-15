@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RateTerm {
+  INSIDENTIL
+  MEMBER
+}
+
+model Rate {
+  id         Int       @id @default(autoincrement())
+  name       String
+  term       RateTerm
+  price      Int
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime  @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("rates")
+}
+
+model Device {
+  id          String    @id @unique
+  fingerprint String
+  created_at  DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at  DateTime  @updatedAt @db.Timestamptz(3)
+  deleted_at  DateTime? @db.Timestamptz(3)
+
+  bookings Booking[]
+
+  @@map("devices")
+}
+
+model Customer {
+  id         Int       @id @default(autoincrement())
+  name       String
+  phone      String
+  email      String
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime  @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  bookings Booking[]
+
+  @@map("customers")
+}
+
+model Promo {
+  id                Int       @id @default(autoincrement())
+  name              String
+  description       String
+  image             Json
+  amount            Int
+  percent           Int
+  min_active_amount Int
+  max_active_amount Int
+  max_amount        Int
+  created_at        DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at        DateTime  @updatedAt @db.Timestamptz(3)
+  deleted_at        DateTime? @db.Timestamptz(3)
+
+  bookings Booking[]
+
+  @@map("promos")
+}
+
+// model Duitku {
+//   id         Int       @id @default(autoincrement())
+//   booking_id       String
+//   // status      String
+
+//   @@map("duitku")
+// }
+
+model Booking {
+  id           String    @id @unique
+  device_id    String?
+  customer_id  Int?
+  detail       Json
+  term         RateTerm
+  platform_fee Int
+  promo_id     Int?
+  discount     Int
+  total        Int
+  created_at   DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at   DateTime  @updatedAt @db.Timestamptz(3)
+  deleted_at   DateTime? @db.Timestamptz(3)
+
+  device   Device?   @relation(fields: [device_id], references: [id])
+  customer Customer? @relation(fields: [customer_id], references: [id])
+  promo    Promo?    @relation(fields: [promo_id], references: [id])
+
+  @@map("bookings")
+}
+
+model Admin {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String
+  password   String
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at DateTime  @updatedAt @db.Timestamptz(3)
+  deleted_at DateTime? @db.Timestamptz(3)
+
+  @@map("admins")
+}

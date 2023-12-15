@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DeviceService } from './device.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
+import { FindDeviceQueryDto } from './dto/find-device.dto';
+import { success } from 'src/http/apiResponse';
 
 @Controller('device')
 export class DeviceController {
@@ -13,8 +15,8 @@ export class DeviceController {
   }
 
   @Get()
-  findAll() {
-    return this.deviceService.findAll();
+  async findAll(@Query() query: FindDeviceQueryDto) {
+    return success(await this.deviceService.findAll(query));
   }
 
   @Get(':id')
